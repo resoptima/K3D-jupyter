@@ -162,6 +162,7 @@ class Plot(widgets.DOMWidget):
     clipping_planes = ListOrArray(empty_ok=True).tag(sync=True)
     colorbar_object_id = Int(-1).tag(sync=True)
     colorbar_scientific = Bool(False).tag(sync=True)
+    colorbar_title = Unicode(default_value="", allow_none=True).tag(sync=True)
     rendering_steps = Int(1).tag(sync=True)
     screenshot = Unicode().tag(sync=True)
     snapshot = Unicode().tag(sync=True)

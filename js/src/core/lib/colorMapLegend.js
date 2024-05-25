@@ -65,6 +65,15 @@ function getColorLegend(K3D, object) {
         'font-family: Arial',
     ].join(';');
 
+    // Add title text
+    const title = document.createElementNS(svgNS, 'text');
+    title.setAttribute('x', '0');
+    title.setAttribute('y', '5');
+    title.setAttribute('font-size', '0.35em');
+    title.setAttribute('fill', 'black');
+    title.innerHTML = K3D.parameters.colorbarTitle;
+    svg.appendChild(title);
+    
     colorMapHelper.createSVGGradient(svg, `colormap${object.id}`, object.color_map.data);
 
     rect.setAttribute('stroke-width', strokeWidth.toString(10));

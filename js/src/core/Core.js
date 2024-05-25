@@ -287,6 +287,7 @@ function K3D(provider, targetDOMNode, parameters) {
             time: 0.0,
             colorbarObjectId: -1,
             colorbarScientific: false,
+            colorbarTitle: "",
             fps: 25.0,
             axes: ['x', 'y', 'z'],
             minimumFps: -1,
@@ -528,7 +529,26 @@ function K3D(provider, targetDOMNode, parameters) {
 
     this.setColorbarScientific = function (flag) {
         self.parameters.colorbarScientific = flag;
-        self.render();
+
+        if (self.colorMapNode) {
+            self.getWorld().targetDOMNode.removeChild(self.colorMapNode);
+            self.colorMapNode = null;
+            self.lastColorMap = null;
+        }
+
+        getColorLegend(self, world.ObjectsListJson[self.parameters.colorbarObjectId]);
+    };
+
+    this.setColorbarTitle = function (title) {
+        self.parameters.colorbarTitle = title;
+
+        if (self.colorMapNode) {
+            self.getWorld().targetDOMNode.removeChild(self.colorMapNode);
+            self.colorMapNode = null;
+            self.lastColorMap = null;
+        }
+
+        getColorLegend(self, world.ObjectsListJson[self.parameters.colorbarObjectId]);
     };
 
     this.setColorMapLegend = function (v) {
@@ -1272,6 +1292,7 @@ function K3D(provider, targetDOMNode, parameters) {
     self.setDirectionalLightingIntensity(self.parameters.lighting);
     self.setColorMapLegend(self.parameters.colorbarObjectId);
     self.setColorbarScientific(self.parameters.colorbarScientific);
+    self.setColorbarTitle(self.parameters.colorbarTitle);
     self.setAutoRendering(self.parameters.autoRendering);
     self.setCameraLock(
         self.parameters.cameraNoRotate,
