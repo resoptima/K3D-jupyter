@@ -8,7 +8,7 @@ function getColorLegend(K3D, object) {
     let textShadow;
     let textGroup;
     let tick;
-    const margin = 5;
+    const margin = 10;
     let majorScale;
     const range = [];
     const intervals = [];
@@ -57,7 +57,7 @@ function getColorLegend(K3D, object) {
     svg.setAttribute('viewBox', '0 0 100 100');
     svg.style.cssText = [
         'position: absolute',
-        'bottom: 10px',
+        'top: 10px',
         'left: 10px',
         'width: 30vh',
         'height: 30vh',
@@ -76,8 +76,8 @@ function getColorLegend(K3D, object) {
     rect.setAttribute('stroke-linecap', 'square');
     rect.setAttribute('stroke', 'black');
     rect.setAttribute('fill', `url(#colormap${object.id})`);
-    rect.setAttribute('width', (15 - margin).toString(10));
-    rect.setAttribute('height', (100 - margin * 2).toString(10));
+    rect.setAttribute('width', (20 - margin).toString(10));
+    rect.setAttribute('height', (110 - margin * 2).toString(10));
     rect.setAttribute('x', margin.toString(10));
     rect.setAttribute('y', margin.toString(10));
 
@@ -115,9 +115,9 @@ function getColorLegend(K3D, object) {
             tick = v.toFixed((majorScale.toString(10).split('.')[1] || '').length);
         }
 
-        line.setAttribute('x1', '13');
+        line.setAttribute('x1', '18');
         line.setAttribute('y1', y.toString(10));
-        line.setAttribute('x2', '17');
+        line.setAttribute('x2', '22');
         line.setAttribute('y2', y.toString(10));
         line.setAttribute('stroke-width', strokeWidth.toString(10));
         line.setAttribute('stroke', 'black');
