@@ -131,17 +131,8 @@ function getColorLegend(K3D, object) {
         text.setAttribute('fill', 'rgb(68, 68, 68)');
         text.innerHTML = tick;
 
-        textShadow.setAttribute('x', '0.5');
-        textShadow.setAttribute('y', '0.5');
-        textShadow.setAttribute('alignment-baseline', 'middle');
-        textShadow.setAttribute('text-anchor', 'end');
-        textShadow.setAttribute('font-size', '0.5em');
-        textShadow.setAttribute('fill', 'rgb(255, 255, 255)');
-        textShadow.innerHTML = tick;
-
         textGroup.setAttribute('pos_y', y.toString(10));
 
-        textGroup.appendChild(textShadow);
         textGroup.appendChild(text);
 
         texts.push(textGroup);
