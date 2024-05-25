@@ -5,19 +5,14 @@ const _ = require('../../lodash');
 function getColorLegend(K3D, object) {
     let line;
     let text;
-    let textShadow;
-    let textGroup;
     let tick;
     const margin = 10;
     let majorScale;
     const range = [];
     const intervals = [];
-    const texts = [];
-    let maxTextWidth = 0;
     let intervalOffset;
     let intervalCount = 0;
     const strokeWidth = 0.5;
-    let resizeListenerId = null;
     let i;
 
     if (!K3D.lastColorMap) {
@@ -102,10 +97,8 @@ function getColorLegend(K3D, object) {
     }
 
     intervals.forEach((v) => {
-        textGroup = document.createElementNS(svgNS, 'g');
         line = document.createElementNS(svgNS, 'line');
         text = document.createElementNS(svgNS, 'text');
-        textShadow = document.createElementNS(svgNS, 'text');
 
         const y = margin + (100 - margin * 2) * (1.0 - (v - range[0]) / colorRange);
 
@@ -123,49 +116,17 @@ function getColorLegend(K3D, object) {
         line.setAttribute('stroke', 'black');
         svg.appendChild(line);
 
-        text.setAttribute('x', '0');
-        text.setAttribute('y', '0');
+        text.setAttribute('x', '24');
+        text.setAttribute('y', y.toString(10));
         text.setAttribute('alignment-baseline', 'middle');
-        text.setAttribute('text-anchor', 'end');
-        text.setAttribute('font-size', '0.5em');
+        text.setAttribute('text-anchor', 'start');
+        text.setAttribute('font-size', '0.3em');
         text.setAttribute('fill', 'rgb(68, 68, 68)');
         text.innerHTML = tick;
-
-        textGroup.setAttribute('pos_y', y.toString(10));
-
-        textGroup.appendChild(text);
-
-        texts.push(textGroup);
-        svg.appendChild(textGroup);
+        svg.appendChild(text);
     });
 
     K3D.getWorld().targetDOMNode.appendChild(svg);
-
-    function tryPosLabels() {
-        if (K3D.getWorld().width < 10 || K3D.getWorld().height < 10) {
-            if (resizeListenerId === null) {
-                resizeListenerId = K3D.on(K3D.events.RESIZED, () => {
-                    tryPosLabels();
-                });
-            }
-        } else {
-            if (resizeListenerId !== null) {
-                K3D.off(K3D.events.RESIZED, resizeListenerId);
-                resizeListenerId = null;
-            }
-
-            maxTextWidth = texts.reduce((max, t) => Math.max(max, t.getBBox().width), 0);
-
-            texts.forEach((t) => {
-                const x = (maxTextWidth + 20).toString(10);
-                const y = t.getAttribute('pos_y');
-
-                t.setAttribute('transform', `translate(${x}, ${y})`);
-            });
-        }
-    }
-
-    tryPosLabels();
 
     K3D.colorMapNode = svg;
 
