@@ -62,7 +62,7 @@ function getColorLegend(K3D, object) {
         'min-height: 150px',
         'z-index: 16777271',
         'pointer-events: none',
-        'font-family: KaTeX_Main',
+        'font-family: Arial',
     ].join(';');
 
     colorMapHelper.createSVGGradient(svg, `colormap${object.id}`, object.color_map.data);
