@@ -66,6 +66,8 @@ module.exports = {
         Volume: require('./objects/Volume'),
         MIP: require('./objects/MIP'),
         Label: require('./objects/Label'),
+        Well: require('./objects/Well'),
+        WellGroup: require('./objects/WellGroup'),
     },
     /**
      * @namespace Interactions

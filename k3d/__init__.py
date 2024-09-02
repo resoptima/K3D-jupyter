@@ -28,7 +28,9 @@ from .factory import (plot,
                       mip,
                       label,
                       vtk_poly_data,
-                      voxel_chunk)
+                      voxel_chunk,
+                      well,
+                      well_group)
 from .objects import create_object, clone_object
 from .plot import Plot
 from .transfer_function_editor import transfer_function_editor

@@ -35,6 +35,8 @@ from .objects import (
     VoxelsGroup,
     VoxelChunk,
     Label,
+    Well,
+    WellGroup,
 )
 from .plot import Plot
 from .transform import process_transform_arguments
@@ -2024,6 +2026,122 @@ def voxel_chunk(voxels, coord, multiple=1, compression_level=0):
         coord=np.array(coord, np.uint32),
         multiple=multiple,
         compression_level=compression_level,
+    )
+
+
+def well(
+    vertices,
+    label="",
+    color=_default_color,
+    width=0.01,
+    name=None,
+    group=None,
+    custom_data=None,
+    compression_level=0,
+    **kwargs
+):
+    """ Create a Well drawable.
+
+    Parameters
+    ----------
+    vertices : array_like (numpy.ndarray or list)
+        Array of (x, y, z) coordinates of well trajectory.
+    label : str, optional
+        Label of the well, by default "".
+    color : int, optional
+        Hex color of the well, by default _default_color.
+    width : float, optional
+        thichness of the well trajectory line, by default 0.01.
+    name : str, optional
+        Object name, by default None.
+    group : str, optional
+        Name of a group, by default None.
+    custom_data: `dict`
+        A object with custom data attached to object.
+    compression_level : int, optional
+        Level of data compression [-1, 9], by default 0.
+    **kwargs
+        For other keyword-only arguments, see :ref:`process_transform_arguments`.
+    
+    Returns
+    -------
+    Well
+        Well Drawable.
+    """
+
+    vertices = np.array(vertices, np.float32)
+
+    return process_transform_arguments(
+        Well(
+            vertices=vertices,
+            label=label,
+            color=color,
+            width=width,
+            name=name,
+            group=group,
+            custom_data=custom_data,
+            compression_level=compression_level,
+        ),
+        **kwargs,
+    )
+
+
+def well_group(
+    well_vertices: list[list[float]] | list[np.ndarray],
+    well_labels: list[str] = [],
+    color=_default_color,
+    width=0.01,
+    name=None,
+    group=None,
+    custom_data=None,
+    compression_level=0,
+    **kwargs,
+):
+    """
+    Create a WellGroup drawable.
+
+    Parameters
+    ----------
+    well_vertices : list[list[float]] | list[np.ndarray]
+        List of arrays of (x, y, z) coordinates of well trajectories.
+        e.g. [[(x1, y1, z1), (x2, y2, z2), ...], [(x1, y1, z1), (x2, y2, z2), ...], ...]
+    well_labels : list[str], optional
+        List of labels of the wells, by default [].
+    color : int, optional
+        Hex color of the well, by default _default_color.
+    width : float, optional
+        thichness of the well trajectory line, by default 0.01.
+    name : str, optional
+        Object name, by default None.
+    group : str, optional
+        Name of a group, by default None.
+    custom_data: `dict`
+        A object with custom data attached to object.
+    compression_level : int, optional
+        Level of data compression [-1, 9], by default 0.
+    **kwargs
+        For other keyword-only arguments, see :ref:`process_transform_arguments`.
+
+    Returns
+    -------
+    WellGroup
+        WellGroup Drawable.
+    """
+    if not well_labels:
+        well_labels = [""] * len(well_vertices)
+
+    return process_transform_arguments(
+        WellGroup(
+            trajectories=well_vertices,
+            labels=well_labels,
+            color=color,
+            width=width,
+            name=name,
+            group=group,
+            custom_data=custom_data,
+            compression_level=compression_level,
+        ),
+        **kwargs,
     )
 
 

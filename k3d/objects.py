@@ -1625,6 +1625,80 @@ class VoxelsGroup(DrawableWithVoxelCallback):
         return get_bounding_box(self.model_matrix)
 
 
+class Well(Drawable):
+    """
+    A well object made up of trajectory line and well label.
+
+    Attributes:
+        vertices: `array_like`.
+            An array with (x, y, z) coordinates.
+        label: `str`.
+            well name (label).
+        color: `int`.
+            Packed RGB color of the trajectory line.
+        width: `float`.
+            trajectory line thickness.
+        model_matrix: `array_like`.
+            4x4 model transform matrix.
+    """
+
+    type = Unicode(read_only=True).tag(sync=True)
+
+    vertices = TimeSeries(Array(dtype=np.float32)).tag(
+        sync=True, **array_serialization_wrap("vertices")
+    )
+    label = Unicode().tag(sync=True)
+    color = TimeSeries(Int(min=0, max=0xFFFFFF)).tag(sync=True)
+    width = TimeSeries(Float(min=EPSILON, default_value=0.01)).tag(sync=True)
+    model_matrix = TimeSeries(Array(dtype=np.float32)).tag(
+        sync=True, **array_serialization_wrap("model_matrix")
+    )
+
+    def __init__(self, **kwargs):
+        super(Well, self).__init__(**kwargs)
+
+        self.set_trait("type", "Well")
+
+    def get_bounding_box(self):
+        return get_bounding_box_points(self.vertices, self.model_matrix)
+
+
+class WellGroup(Drawable):
+    """ 
+    An object representing a group of wells.
+
+    Attributes:
+        labels: `array_like`.
+            An array of well names (labels).
+        trajectories: `array_like`.
+            An array of well trajectories. Each trajectory is an array of (x, y, z) coordinates.
+            e.g. [[x1, y1, z1, x2, y2, z2, ...], [x1, y1, z1, x2, y2, z2, ...], ...]
+        color: `int`.
+            Packed RGB color of the trajectory lines.
+        width: `float`.
+            trajectory line thickness.
+        model_matrix: `array_like`.
+            4x4 model transform matrix.
+    """
+
+    type = Unicode(read_only=True).tag(sync=True)
+
+    labels = TimeSeries(List()).tag(sync=True)
+    trajectories = TimeSeries(List()).tag(
+        sync=True, **array_serialization_wrap("trajectories")
+    )
+    color = TimeSeries(Int(min=0, max=0xFFFFFF)).tag(sync=True)
+    width = TimeSeries(Float(min=EPSILON, default_value=0.01)).tag(sync=True)
+    model_matrix = TimeSeries(Array(dtype=np.float32)).tag(
+        sync=True, **array_serialization_wrap("model_matrix")
+    )
+
+    def __init__(self, **kwargs):
+        super(WellGroup, self).__init__(**kwargs)
+
+        self.set_trait("type", "WellGroup")
+
+
 objects_map = {
     'Line': Line,
     'Label': Label,
@@ -1643,7 +1717,9 @@ objects_map = {
     'Vectors': Vectors,
     'Volume': Volume,
     'Voxels': Voxels,
-    'VoxelsGroup': VoxelsGroup
+    'VoxelsGroup': VoxelsGroup,
+    'Well': Well,
+    'WellGroup': WellGroup,
 }
 
 
