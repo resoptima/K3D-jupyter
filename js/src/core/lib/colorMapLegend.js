@@ -6,7 +6,10 @@ function getColorLegend(K3D, object) {
     let line;
     let text;
     let tick;
-    const margin = 10;
+    const marginX = 2;
+    const marginY = 10;
+    const rectWidth = 10;
+    const rectHeight = 100;
     let majorScale;
     const range = [];
     const intervals = [];
@@ -52,11 +55,11 @@ function getColorLegend(K3D, object) {
     svg.setAttribute('viewBox', '0 0 100 100');
     svg.style.cssText = [
         'position: absolute',
-        'top: 10px',
-        'left: 10px',
+        'top: 5px',
+        'left: 5px',
         'width: 30vh',
         'height: 30vh',
-        'max-width: 350px',
+        'max-width: 300px',
         'max-height: 300px',
         'min-width: 150px',
         'min-height: 150px',
@@ -69,7 +72,7 @@ function getColorLegend(K3D, object) {
     const title = document.createElementNS(svgNS, 'text');
     title.setAttribute('x', '0');
     title.setAttribute('y', '5');
-    title.setAttribute('font-size', '0.35em');
+    title.setAttribute('font-size', '0.3em');
     title.setAttribute('fill', 'black');
     title.innerHTML = K3D.parameters.colorbarTitle;
     svg.appendChild(title);
@@ -80,10 +83,10 @@ function getColorLegend(K3D, object) {
     rect.setAttribute('stroke-linecap', 'square');
     rect.setAttribute('stroke', 'black');
     rect.setAttribute('fill', `url(#colormap${object.id})`);
-    rect.setAttribute('width', (20 - margin).toString(10));
-    rect.setAttribute('height', (110 - margin * 2).toString(10));
-    rect.setAttribute('x', margin.toString(10));
-    rect.setAttribute('y', margin.toString(10));
+    rect.setAttribute('width', rectWidth.toString(10));
+    rect.setAttribute('height', (rectHeight - marginY - 2).toString(10));
+    rect.setAttribute('x', marginX.toString(10));
+    rect.setAttribute('y', marginY.toString(10));
 
     svg.appendChild(rect);
 
@@ -109,7 +112,7 @@ function getColorLegend(K3D, object) {
         line = document.createElementNS(svgNS, 'line');
         text = document.createElementNS(svgNS, 'text');
 
-        const y = margin + (100 - margin * 2) * (1.0 - (v - range[0]) / colorRange);
+        const y = marginY + (rectHeight - marginY - 2) * (1.0 - (v - range[0]) / colorRange);
 
         if (K3D.parameters.colorbarScientific) {
             tick = v.toPrecision(4);
@@ -117,19 +120,19 @@ function getColorLegend(K3D, object) {
             tick = v.toFixed((majorScale.toString(10).split('.')[1] || '').length);
         }
 
-        line.setAttribute('x1', '18');
+        line.setAttribute('x1', (marginX + rectWidth - 1).toString(10));
         line.setAttribute('y1', y.toString(10));
-        line.setAttribute('x2', '22');
+        line.setAttribute('x2', (marginX + rectWidth + 1).toString(10));
         line.setAttribute('y2', y.toString(10));
         line.setAttribute('stroke-width', strokeWidth.toString(10));
         line.setAttribute('stroke', 'black');
         svg.appendChild(line);
 
-        text.setAttribute('x', '24');
+        text.setAttribute('x', (marginX + rectWidth + 2).toString(10));
         text.setAttribute('y', y.toString(10));
         text.setAttribute('alignment-baseline', 'middle');
         text.setAttribute('text-anchor', 'start');
-        text.setAttribute('font-size', '0.3em');
+        text.setAttribute('font-size', '0.25em');
         text.setAttribute('fill', 'rgb(68, 68, 68)');
         text.innerHTML = tick;
         svg.appendChild(text);
