@@ -12,6 +12,7 @@ function getColorLegend(K3D, object) {
     const rectHeight = 100;
     let majorScale;
     const range = [];
+    let logRange = [];
     const intervals = [];
     let intervalOffset;
     let intervalCount = 0;
@@ -30,8 +31,21 @@ function getColorLegend(K3D, object) {
         return;
     }
 
-    range[0] = Math.min(object.color_range[0], object.color_range[1]);
-    range[1] = Math.max(object.color_range[0], object.color_range[1]);
+    const colorMapScale = K3D.parameters.colorbarScale || 'linear';
+
+    let lower = Math.min(object.color_range[0], object.color_range[1]);
+    let upper = Math.max(object.color_range[0], object.color_range[1]);
+
+    if (colorMapScale === 'log' && lower <= 0) {
+        lower = 1e-4;
+    }
+    if (lower === upper) {
+        lower -= 1e-3;
+        upper += 1e-3;
+    }
+
+    range[0] = lower;
+    range[1] = upper;
 
     // avoid regenerating colormap
     if (K3D.lastColorMap.objectId === object.id &&
@@ -93,30 +107,49 @@ function getColorLegend(K3D, object) {
 
     const colorRange = range[1] - range[0];
     majorScale = mathHelper.pow10ceil(Math.abs(colorRange)) / 10.0;
-
-    while (intervalCount < 4) {
-        intervalOffset = mathHelper.fmod(range[0], majorScale);
-        intervalOffset = (intervalOffset > 0 ? majorScale - intervalOffset : 0);
-        intervalCount = Math.floor((Math.abs(colorRange) - intervalOffset + majorScale * 0.001) / majorScale);
-
-        if (intervalCount < 4) {
-            majorScale /= 2.0;
+    
+    if (colorMapScale === 'linear') {
+        while (intervalCount < 4) {
+            intervalOffset = mathHelper.fmod(range[0], majorScale);
+            intervalOffset = (intervalOffset > 0 ? majorScale - intervalOffset : 0);
+            intervalCount = Math.floor((Math.abs(colorRange) - intervalOffset + majorScale * 0.001) / majorScale);
+    
+            if (intervalCount < 4) {
+                majorScale /= 2.0;
+            }
         }
-    }
+    
+        for (i = 0; i <= intervalCount; i++) {
+            intervals.push(range[0] + intervalOffset + i * majorScale);
+        }
+    } 
+    else if (colorMapScale === 'log') {
+        logRange = [Math.log10(range[0]), Math.log10(range[1])];
+        //logColorRange = logRange[1] - logRange[0];
+        //const logMajorScale = mathHelper.pow10ceil(Math.abs(logColorRange)) / 10.0;
 
-    for (i = 0; i <= intervalCount; i++) {
-        intervals.push(range[0] + intervalOffset + i * majorScale);
+        // find whole integers in log10ColorRange
+        const logStart = Math.ceil(logRange[0] - 1e-5)
+        const logEnd = Math.floor(logRange[1] + 1e-5)
+        // add whole integers from logStart to logEnd
+        for (let i = logStart; i <= logEnd; i++) {
+            intervals.push(i);
+        }
     }
 
     intervals.forEach((v) => {
         line = document.createElementNS(svgNS, 'line');
         text = document.createElementNS(svgNS, 'text');
 
-        const y = marginY + (rectHeight - marginY - 2) * (1.0 - (v - range[0]) / colorRange);
-
-        if (K3D.parameters.colorbarScientific) {
-            tick = v.toPrecision(4);
-        } else {
+        let y = marginY + (rectHeight - marginY - 2) * (1.0 - (v - range[0]) / colorRange);
+        if (colorMapScale === 'log') {
+            y = marginY + (rectHeight - marginY - 2) * (1.0 - (v - logRange[0]) / (logRange[1] - logRange[0]));
+            tick = Math.pow(10, v).toFixed(v < 1 ? Math.abs(v) : 0);
+        } 
+        else if (K3D.parameters.colorbarScientific) {
+            tick = v.toExponential(0);
+        } 
+        else {
             tick = v.toFixed((majorScale.toString(10).split('.')[1] || '').length);
         }
 

@@ -60,6 +60,12 @@ class Plot(widgets.DOMWidget):
             Camera Field of View.
         camera_damping_factor: `Float`.
             Defines the intensity of damping. Default is 0 (disabled).
+        colorbar_title: `string`
+            Title to display on the colorbar.
+        colorbar_scale: `string`
+            Scale of the colorbar. Can be 'linear' or 'log'.
+        colorbar_scientific: `bool`
+            Enable scientific notation on the colorbar.
         snapshot_type: `string`.
             Can be 'full', 'online' or 'inline'.
         axes: `list`.
@@ -163,6 +169,7 @@ class Plot(widgets.DOMWidget):
     colorbar_object_id = Int(-1).tag(sync=True)
     colorbar_scientific = Bool(False).tag(sync=True)
     colorbar_title = Unicode(default_value="", allow_none=True).tag(sync=True)
+    colorbar_scale = Unicode(default_value="linear", allow_none=True).tag(sync=True)
     rendering_steps = Int(1).tag(sync=True)
     screenshot = Unicode().tag(sync=True)
     snapshot = Unicode().tag(sync=True)

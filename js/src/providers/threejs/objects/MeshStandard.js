@@ -2,6 +2,7 @@ const THREE = require('three');
 const interactionsHelper = require('../helpers/Interactions');
 const colorMapHelper = require('../../../core/lib/helpers/colorMap');
 const {handleColorMap} = require('../helpers/Fn');
+const {setUVs} = require('../helpers/Fn');
 const {areAllChangesResolve} = require('../helpers/Fn');
 const {commonUpdate} = require('../helpers/Fn');
 const {getSide} = require('../helpers/Fn');
@@ -30,6 +31,7 @@ module.exports = {
             const colors = (config.colors && config.colors.data) || null;
             const colorRange = config.color_range;
             const colorMap = (config.color_map && config.color_map.data) || null;
+            const colorMapScale = K3D.parameters.colorbarScale || 'linear';
             const attribute = (config.attribute && config.attribute.data) || null;
             const triangleAttribute = (config.triangles_attribute && config.triangles_attribute.data) || null;
             const normals = (config.normals && config.normals.data) || null;
@@ -95,7 +97,7 @@ module.exports = {
                 attribute && colorRange && colorMap && attribute.length > 0
                 && colorRange.length > 0 && colorMap.length > 0
             ) {
-                handleColorMap(geometry, colorMap, colorRange, attribute, material);
+                handleColorMap(geometry, colorMap, colorRange, attribute, material, colorMapScale);
                 finish();
             } else if (
                 triangleAttribute && colorRange && colorMap && triangleAttribute.length > 0
@@ -108,7 +110,7 @@ module.exports = {
                     preparedtriangleAttribute[i] = triangleAttribute[Math.floor(i / 3)];
                 }
 
-                handleColorMap(geometry, colorMap, colorRange, preparedtriangleAttribute, material);
+                handleColorMap(geometry, colorMap, colorRange, preparedtriangleAttribute, material, colorMapScale);
                 finish();
             } else if (textureImage && textureFileFormat && uvs) {
                 image = document.createElement('img');
@@ -142,21 +144,23 @@ module.exports = {
         }
 
         if (obj.geometry && typeof (obj.geometry.attributes.uv) !== 'undefined') {
-            if (typeof (changes.color_range) !== 'undefined' && !changes.color_range.timeSeries) {
-                data = obj.geometry.attributes.uv.array;
 
+            const colorMapScale = K3D.parameters.colorbarScale || 'linear';
+
+            if (typeof (changes.color_range) !== 'undefined' && !changes.color_range.timeSeries) {
+                
                 if (config.attribute.data.length > 0) {
-                    for (i = 0; i < data.length; i++) {
-                        data[i] = (config.attribute.data[i] - config.color_range[0])
-                            / (config.color_range[1] - config.color_range[0]);
-                    }
+                    setUVs(obj.geometry, config.color_range, config.attribute.data, colorMapScale);
                 }
 
                 if (config.triangles_attribute.data.length > 0) {
-                    for (i = 0; i < data.length; i++) {
-                        data[i] = (config.triangles_attribute.data[Math.floor(i / 3)] - config.color_range[0])
-                            / (config.color_range[1] - config.color_range[0]);
+                    const triangleAttribute = config.triangles_attribute.data;
+                    let preparedtriangleAttribute = new Float32Array(triangleAttribute.length * 3);
+                    for (let i = 0; i < preparedtriangleAttribute.length; i++) {
+                        preparedtriangleAttribute[i] = triangleAttribute[Math.floor(i / 3)];
                     }
+                    
+                    setUVs(obj.geometry, changes.color_range, preparedtriangleAttribute, colorMapScale);
                 }
 
                 obj.geometry.attributes.uv.needsUpdate = true;
@@ -164,12 +168,8 @@ module.exports = {
             }
 
             if (obj.geometry && typeof (changes.attribute) !== 'undefined' && !changes.attribute.timeSeries) {
-                data = obj.geometry.attributes.uv.array;
-
-                for (i = 0; i < data.length; i++) {
-                    data[i] = (changes.attribute.data[i] - config.color_range[0])
-                        / (config.color_range[1] - config.color_range[0]);
-                }
+                
+                setUVs(obj.geometry, config.color_range, changes.attribute.data, colorMapScale);
 
                 obj.geometry.attributes.uv.needsUpdate = true;
                 resolvedChanges.attribute = null;

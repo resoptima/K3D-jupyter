@@ -301,6 +301,7 @@ class PlotView extends widgets.DOMWidgetView {
         this.model.on('change:colorbar_object_id', this._setColorMapLegend, this);
         this.model.on('change:colorbar_scientific', this._setColorbarScientific, this);
         this.model.on('change:colorbar_title', this._setColorbarTitle, this);
+        this.model.on('change:colorbar_scale', this._setColorbarScale, this);
         this.model.on('change:rendering_steps', this._setRenderingSteps, this);
         this.model.on('change:axes', this._setAxes, this);
         this.model.on('change:camera_no_rotate', this._setCameraLock, this);
@@ -494,6 +495,10 @@ class PlotView extends widgets.DOMWidgetView {
 
     _setColorbarTitle() {
         this.K3DInstance.setColorbarTitle(this.model.get('colorbar_title'));
+    };
+
+    _setColorbarScale() {
+        this.K3DInstance.setColorbarScale(this.model.get('colorbar_scale'));
     };
 
     _setCamera() {

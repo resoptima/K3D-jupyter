@@ -22,6 +22,43 @@ function getSide(config) {
     return map[config.side] || map.front;
 }
 
+function setUVs(geometry, colorRange, attributes, colorMapScale = 'linear') {
+    let uvs;
+    let i;
+
+    if (attributes) {
+        uvs = new Float32Array(attributes.length);
+
+        let lower = colorRange[0];
+        let upper = colorRange[1];
+
+        if (colorMapScale === 'log' && lower <= 0) {
+            lower = 1e-4;
+        }
+
+        if (lower === upper) {
+            lower -= 1e-3;
+            upper += 1e-3;
+        }
+
+        for (i = 0; i < attributes.length; i++) {
+            let value = attributes[i];
+            if (colorMapScale === 'log') {
+                // handle zero or negative values
+                if (value <= 0) {
+                    uvs[i] = 0;
+                } else {
+                    uvs[i] = (Math.log(value) - Math.log(lower)) / (Math.log(upper) - Math.log(lower));
+                }
+            } else {
+                uvs[i] = (value - lower) / (upper - lower);
+            }
+        }
+
+        geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 1));
+    }
+}
+
 module.exports = {
     /**
      * Finds the nearest (greater than x) power of two of given x
@@ -199,10 +236,7 @@ module.exports = {
         return heads;
     },
 
-    handleColorMap(geometry, colorMap, colorRange, attributes, material) {
-        let uvs;
-        let i;
-
+    handleColorMap(geometry, colorMap, colorRange, attributes, material, colorMapScale = 'linear') {
         const canvas = createCanvasGradient(colorMap, 1024);
 
         const texture = new THREE.CanvasTexture(
@@ -219,15 +253,7 @@ module.exports = {
             map: texture, color: 0xffffff,
         });
 
-        if (attributes) {
-            uvs = new Float32Array(attributes.length);
-
-            for (i = 0; i < attributes.length; i++) {
-                uvs[i] = (attributes[i] - colorRange[0]) / (colorRange[1] - colorRange[0]);
-            }
-
-            geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 1));
-        }
+        setUVs(geometry, colorRange, attributes, colorMapScale);
     },
 
     typedArrayToThree(creator) {
@@ -326,4 +352,5 @@ module.exports = {
     },
 
     getSide,
+    setUVs
 };

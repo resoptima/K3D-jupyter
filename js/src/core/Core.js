@@ -288,6 +288,7 @@ function K3D(provider, targetDOMNode, parameters) {
             colorbarObjectId: -1,
             colorbarScientific: false,
             colorbarTitle: "",
+            colorbarScale: "linear",
             fps: 25.0,
             axes: ['x', 'y', 'z'],
             minimumFps: -1,
@@ -549,6 +550,49 @@ function K3D(provider, targetDOMNode, parameters) {
         }
 
         getColorLegend(self, world.ObjectsListJson[self.parameters.colorbarObjectId]);
+    };
+
+    this.setColorbarScale = function (colorbar_scale) {
+        self.parameters.colorbarScale = colorbar_scale;
+        
+        const id = self.parameters.colorbarObjectId;
+        // get current object and its config
+        const config = world.ObjectsListJson[id];
+        let object = self.Provider.Helpers.getObjectById(world, id);
+
+        if (!config || !object) {
+            return;
+        }
+        // also check if trinagles_attribute is present
+        if (!config.triangles_attribute) {
+            return;
+        }
+
+        const triangleAttribute = config.triangles_attribute.data;
+        let preparedtriangleAttribute = new Float32Array(triangleAttribute.length * 3);
+        for (let i = 0; i < preparedtriangleAttribute.length; i++) {
+            preparedtriangleAttribute[i] = triangleAttribute[Math.floor(i / 3)];
+        }
+
+        self.Provider.Helpers.setUVs(
+            object.geometry, 
+            config.color_range, 
+            preparedtriangleAttribute,
+            colorbar_scale
+        );
+
+        object.geometry.attributes.uv.needsUpdate = true;
+        
+        // refresh colormap
+        if (self.colorMapNode) {
+            self.getWorld().targetDOMNode.removeChild(self.colorMapNode);
+            self.colorMapNode = null;
+            self.lastColorMap = null;
+        }
+        
+        getColorLegend(self, config);
+        
+        self.render();
     };
 
     this.setColorMapLegend = function (v) {
@@ -1293,6 +1337,7 @@ function K3D(provider, targetDOMNode, parameters) {
     self.setColorMapLegend(self.parameters.colorbarObjectId);
     self.setColorbarScientific(self.parameters.colorbarScientific);
     self.setColorbarTitle(self.parameters.colorbarTitle);
+    self.setColorbarScale(self.parameters.colorbarScale);
     self.setAutoRendering(self.parameters.autoRendering);
     self.setCameraLock(
         self.parameters.cameraNoRotate,
