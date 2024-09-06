@@ -120,7 +120,7 @@ function getColorLegend(K3D, object) {
             tick = v.toFixed((majorScale.toString(10).split('.')[1] || '').length);
         }
 
-        line.setAttribute('x1', (marginX + rectWidth - 1).toString(10));
+        line.setAttribute('x1', (marginX + rectWidth - 2).toString(10));
         line.setAttribute('y1', y.toString(10));
         line.setAttribute('x2', (marginX + rectWidth + 1).toString(10));
         line.setAttribute('y2', y.toString(10));
