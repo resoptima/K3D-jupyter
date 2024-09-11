@@ -64,6 +64,8 @@ class Plot(widgets.DOMWidget):
             Title to display on the colorbar.
         colorbar_scale: `string`
             Scale of the colorbar. Can be 'linear' or 'log'.
+        main_title: `string`
+            Title to display on the plot.
         colorbar_scientific: `bool`
             Enable scientific notation on the colorbar.
         snapshot_type: `string`.
@@ -170,6 +172,7 @@ class Plot(widgets.DOMWidget):
     colorbar_scientific = Bool(False).tag(sync=True)
     colorbar_title = Unicode(default_value="", allow_none=True).tag(sync=True)
     colorbar_scale = Unicode(default_value="linear", allow_none=True).tag(sync=True)
+    main_title = Unicode(default_value="", allow_none=True).tag(sync=True)
     rendering_steps = Int(1).tag(sync=True)
     screenshot = Unicode().tag(sync=True)
     snapshot = Unicode().tag(sync=True)

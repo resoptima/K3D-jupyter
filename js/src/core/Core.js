@@ -289,6 +289,7 @@ function K3D(provider, targetDOMNode, parameters) {
             colorbarScientific: false,
             colorbarTitle: "",
             colorbarScale: "linear",
+            mainTitle: "",
             fps: 25.0,
             axes: ['x', 'y', 'z'],
             minimumFps: -1,
@@ -624,6 +625,56 @@ function K3D(provider, targetDOMNode, parameters) {
         }
 
         getColorLegend(self, world.ObjectsListJson[self.parameters.colorbarObjectId] || v);
+    };
+
+    this.setMainTitle = function (v) {
+
+        self.parameters.mainTitle = v;
+
+        // main title
+        let existingDiv = world.overlayDOMNode.querySelector('.mainTitle');
+        if (existingDiv) {
+            existingDiv.remove();
+        }
+
+        const mainTitleDiv = document.createElement('div');
+        mainTitleDiv.setAttribute('class', 'mainTitle');
+        mainTitleDiv.innerHTML = v;
+        // center horizontally with 100px margin to left/right
+        mainTitleDiv.style.cssText = [
+            'position: absolute',
+            'top: 5px',
+            'left: 50%',
+            'transform: translateX(-50%)',
+            'z-index: 16777271',
+            'pointer-events: none',
+            'font-family: Arial',
+        ].join(';');
+        
+        // has to be added to overlayDOMNode to be included in the screenshot
+        world.overlayDOMNode.appendChild(mainTitleDiv);
+
+        // sub title
+        existingDiv = world.targetDOMNode.querySelector('.subTitle');
+        if (existingDiv) {
+            existingDiv.remove();
+        }
+        
+        const subTitle = document.createElement('div');
+        subTitle.setAttribute('class', 'subTitle');
+        subTitle.innerHTML = "Mouse controls: left-click/drag to rotate, right-click/drag (or SHIFT+left-drag) to pan, scroll to zoom in/out";
+        // put it on top center
+        subTitle.style.cssText = [
+            'position: absolute',
+            'bottom: 5px',
+            'left: 5px',
+            'z-index: 16777271',
+            'font-family: Arial',
+            'font-size: 0.8em',
+        ].join(';');
+        
+        // we don't want this in the screenshot
+        world.targetDOMNode.appendChild(subTitle);
     };
 
     /**
@@ -1338,6 +1389,7 @@ function K3D(provider, targetDOMNode, parameters) {
     self.setColorbarScientific(self.parameters.colorbarScientific);
     self.setColorbarTitle(self.parameters.colorbarTitle);
     self.setColorbarScale(self.parameters.colorbarScale);
+    self.setMainTitle(self.parameters.mainTitle);
     self.setAutoRendering(self.parameters.autoRendering);
     self.setCameraLock(
         self.parameters.cameraNoRotate,
